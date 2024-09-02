@@ -34,15 +34,15 @@ const userSchema = new Schema({
         enum: ['active', 'notActive']
 
     },
-    role:{
-        type:String,
+    role: {
+        type: String,
         enum: ['admin', 'user']
     }
 },
-{
-    timestamps: true
-});
+    {
+        timestamps: true
+    });
 
-const userModel=model('User',userSchema);
+const userModel = model('User', userSchema);
 
 export default userModel;
