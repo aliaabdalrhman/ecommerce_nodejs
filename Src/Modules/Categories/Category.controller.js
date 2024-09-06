@@ -31,16 +31,16 @@ export const createCategory = async (req, res, next) => {
 // Get category details by ID
 export const getCategoryDetails = async (req, res, next) => {
     // Extract the category ID from the request parameters
-    const { _id } = req.params;
+    const { id } = req.params;
     // Find the category by its ID in the database
-    const category = await categoryModel.findById({ _id });
+    const category = await categoryModel.findById({ _id:id  });
     // If the category doesn't exist, return an error response
     if (!category) {
         return next(new AppError('Invalid category', 404));
     } else {
         // If the category exists, retrieve the full details
         // Populate the 'createdBy' and 'updatedBy' fields with their associated usernames
-        const CategoryDetails = await categoryModel.findById({ _id }).populate([
+        const CategoryDetails = await categoryModel.findById({ _id:id }).populate([
             {
                 path: 'createdBy',
                 select: 'username'
@@ -60,11 +60,11 @@ export const updateCategory = async (req, res, next) => {
     // Extract the new 'name' and 'status' values from the request body
     const { name, status } = req.body;
     // Extract the category ID from the request parameters
-    const { _id } = req.params;
+    const { id } = req.params;
     // Find the category by its ID and update it with the new 'name' and 'status'
     // The 'new: true' option returns the updated document
     // Populate the 'createdBy' and 'updatedBy' fields with their associated usernames
-    const category = await categoryModel.findByIdAndUpdate({ _id }, { name, status }, { new: true }).populate([
+    const category = await categoryModel.findByIdAndUpdate({ _id:id }, { name, status }, { new: true }).populate([
         {
             path: 'createdBy',
             select: 'username'
@@ -86,10 +86,10 @@ export const updateCategory = async (req, res, next) => {
 //  delete a category by its ID
 export const deletCategory = async (req, res, next) => {
     // Extract the category ID from the request parameters
-    const { _id } = req.params;
+    const { id } = req.params;
     // Find the category by its ID and delete it from the database
     // Populate the 'createdBy' and 'updatedBy' fields with their associated usernames
-    const category = await categoryModel.findByIdAndDelete({ _id }).populate([
+    const category = await categoryModel.findByIdAndDelete({ _id:id }).populate([
         {
             path: 'createdBy',
             select: 'username'

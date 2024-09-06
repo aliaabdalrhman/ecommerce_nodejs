@@ -11,6 +11,14 @@ export const generalFields = {
         'string.empty': 'password is required',
         'string.min': 'password must be at least 8 characters long',
     }),
+    id: joi.string().length(24).required().messages({
+        "string.length": "id must be 24 characters long",
+    }),
+    name: joi.string().required().min(3).max(50).messages({
+        'string.empty': 'name is required',
+        'string.min': 'username must be at least 3 characters long',
+        'string.max': 'username cannot be more than 20 characters long'
+    }),
 }
 
 const validation = (schema) => {
