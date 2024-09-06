@@ -16,8 +16,8 @@ export const generalFields = {
     }),
     name: joi.string().required().min(3).max(50).messages({
         'string.empty': 'name is required',
-        'string.min': 'username must be at least 3 characters long',
-        'string.max': 'username cannot be more than 20 characters long'
+        'string.min': 'name must be at least 3 characters long',
+        'string.max': 'name cannot be more than 20 characters long'
     }),
 }
 
