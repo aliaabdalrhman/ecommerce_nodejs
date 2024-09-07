@@ -1,4 +1,5 @@
 import categoryModel from "../../../DB/Models/Category.model.js";
+import userModel from "../../../DB/Models/User.model.js";
 import { AppError } from "../../../GlobalError.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
 
@@ -12,19 +13,23 @@ export const getAllCategories = async (rea, res, next) => {
 
 // create category 
 export const createCategory = async (req, res, next) => {
-    // Upload the image to Cloudinary and get the secure URL
-    const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-    const { name, createdBy, updatedBy } = req.body;
+    req.body.name = req.body.name.toLowerCase();
     // Check if a category with the same name already exists
-    const category = await categoryModel.findOne({ name });
+    const category = await categoryModel.findOne({ name: req.body.name });
     if (category) {
         // If the category exists, return a conflict error
         return next(new AppError("category already exists", 409));
     }
     else {
+        // Upload the image to Cloudinary and get the secure URL
+        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `${process.env.APPNAME}/category` });
+        req.body.image = { secure_url, public_id };
+        req.body.createdBy = req.id;
+        req.body.updatedBy = req.id;
         // If the category doesn't exist, create a new one
-        await categoryModel.create({ name, createdBy, updatedBy, image: secure_url });
-        return res.status(201).json({ message: "success" });
+        const category = await categoryModel.create(req.body);
+        return res.status(201).json({ message: "success", category });
+
     }
 }
 
@@ -33,14 +38,14 @@ export const getCategoryDetails = async (req, res, next) => {
     // Extract the category ID from the request parameters
     const { id } = req.params;
     // Find the category by its ID in the database
-    const category = await categoryModel.findById({ _id:id  });
+    const category = await categoryModel.findById({ _id: id });
     // If the category doesn't exist, return an error response
     if (!category) {
         return next(new AppError('Invalid category', 404));
     } else {
         // If the category exists, retrieve the full details
         // Populate the 'createdBy' and 'updatedBy' fields with their associated usernames
-        const CategoryDetails = await categoryModel.findById({ _id:id }).populate([
+        const CategoryDetails = await categoryModel.findById({ _id: id }).populate([
             {
                 path: 'createdBy',
                 select: 'username'
@@ -64,7 +69,7 @@ export const updateCategory = async (req, res, next) => {
     // Find the category by its ID and update it with the new 'name' and 'status'
     // The 'new: true' option returns the updated document
     // Populate the 'createdBy' and 'updatedBy' fields with their associated usernames
-    const category = await categoryModel.findByIdAndUpdate({ _id:id }, { name, status }, { new: true }).populate([
+    const category = await categoryModel.findByIdAndUpdate({ _id: id }, { name, status }, { new: true }).populate([
         {
             path: 'createdBy',
             select: 'username'
@@ -89,7 +94,7 @@ export const deletCategory = async (req, res, next) => {
     const { id } = req.params;
     // Find the category by its ID and delete it from the database
     // Populate the 'createdBy' and 'updatedBy' fields with their associated usernames
-    const category = await categoryModel.findByIdAndDelete({ _id:id }).populate([
+    const category = await categoryModel.findByIdAndDelete({ _id: id }).populate([
         {
             path: 'createdBy',
             select: 'username'
@@ -103,7 +108,10 @@ export const deletCategory = async (req, res, next) => {
     if (!category) {
         return next(new AppError('Invalid category', 404)); // Handle case where the category ID is invalid or does not exist
     } else {
+        await cloudinary.uploader.destroy(category.image.public_id);
         // If the deletion is successful, return a success message with the deleted category details
         return res.status(200).json({ message: "success", category });
     }
+
+
 }
