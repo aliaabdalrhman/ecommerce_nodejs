@@ -1,6 +1,5 @@
 // Import necessary functions and types from Mongoose
 // Mongoose is a MongoDB object modeling tool that provides schema-based solutions to model data
-// import { object, required } from "joi";
 import { model, Schema, Types } from "mongoose";
 
 const categorySchema = new Schema({

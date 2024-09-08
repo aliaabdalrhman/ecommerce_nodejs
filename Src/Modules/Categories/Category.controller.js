@@ -1,5 +1,5 @@
 import categoryModel from "../../../DB/Models/Category.model.js";
-import userModel from "../../../DB/Models/User.model.js";
+import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
 
@@ -64,12 +64,13 @@ export const getCategoryDetails = async (req, res, next) => {
 export const updateCategory = async (req, res, next) => {
     // Extract the new 'name' and 'status' values from the request body
     const { name, status } = req.body;
+    const updatedBy = req.id;
     // Extract the category ID from the request parameters
     const { id } = req.params;
     // Find the category by its ID and update it with the new 'name' and 'status'
     // The 'new: true' option returns the updated document
     // Populate the 'createdBy' and 'updatedBy' fields with their associated usernames
-    const category = await categoryModel.findByIdAndUpdate({ _id: id }, { name, status }, { new: true }).populate([
+    const category = await categoryModel.findByIdAndUpdate({ _id: id }, { name, status, updatedBy }, { new: true }).populate([
         {
             path: 'createdBy',
             select: 'username'
@@ -108,7 +109,22 @@ export const deletCategory = async (req, res, next) => {
     if (!category) {
         return next(new AppError('Invalid category', 404)); // Handle case where the category ID is invalid or does not exist
     } else {
+        // Delete the category image from Cloudinary
         await cloudinary.uploader.destroy(category.image.public_id);
+
+        // Find all subcategories associated with the category
+        const subCategories = await subCategoryModel.find({ categoryId: id });
+
+        // Loop through each subcategory and delete its image from Cloudinary
+        for (const subCategory of subCategories) {
+            if (subCategory.image && subCategory.image.public_id) {
+                await cloudinary.uploader.destroy(subCategory.image.public_id);
+            }
+        }
+
+        // Delete all subcategories related to the deleted category
+        await subCategoryModel.deleteMany({ categoryId: id });
+
         // If the deletion is successful, return a success message with the deleted category details
         return res.status(200).json({ message: "success", category });
     }

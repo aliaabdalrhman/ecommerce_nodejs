@@ -19,8 +19,8 @@ export const generalFields = {
         'string.min': 'name must be at least 3 characters long',
         'string.max': 'name cannot be more than 20 characters long'
     }),
-    status: joi.string().valid('Active', 'active', 'inactive', 'InActive').messages({
-        'any.only': 'status must be either Active ,active, InActive or inactive',
+    status: joi.string().valid('Active', 'InActive').messages({
+        'any.only': 'status must be either Active or InActive ',
         'string.empty': 'status is required'
     })
 }

@@ -3,13 +3,16 @@ import { AppError } from "../GlobalError.js";
 import userRouter from "./Modules/Users/User.router.js";
 import categoryRouter from "./Modules/Categories/Category.router.js"
 import authRouter from "./Modules/Auth/Auth.router.js";
+import subCategoryRouter from './Modules/SubCategory/SubCategory.router.js'
 
 const initApp = (app, express) => {
     connectDb();
     app.use(express.json());
-    app.use('/auth',authRouter);
+    app.use('/auth', authRouter);
     app.use('/users', userRouter);
     app.use('/categories', categoryRouter);
+    app.use('/categories/subcategory', subCategoryRouter);
+
     app.get('*', (req, res, next) => {
         return next(new AppError("page not found", 404));
     });
