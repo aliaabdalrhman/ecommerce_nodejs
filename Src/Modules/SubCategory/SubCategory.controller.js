@@ -6,7 +6,7 @@ import cloudinary from "../../Utilities/Cloudinary.js";
 export const createSubCategory = async (req, res, next) => {
     req.body.name = req.body.name.toLowerCase();
     const { categoryId } = req.params;
-    const category = await categoryModel.findById({ _id:categoryId });
+    const category = await categoryModel.findById({ _id: categoryId });
     if (!category) {
         return next(new AppError("Invalid Category", 404));
 
@@ -18,21 +18,16 @@ export const createSubCategory = async (req, res, next) => {
         }
         else {
             const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `${process.env.APPNAME}/subCategory` });
-            const subCategory = await subCategoryModel.create({ name: req.body.name, image: { secure_url, public_id }, createdBy: req.id, updatedBy: req.id, categoryId });
-            return res.status(201).json({ message: "success", subCategory });
+            await subCategoryModel.create({ name: req.body.name, image: { secure_url, public_id }, createdBy: req.id, updatedBy: req.id, categoryId });
+            return res.status(201).json({ message: "success" });
         }
     }
 
 }
 
-export const getAllSubCategory = async (req, res, next) => {
-    const subCategory = await subCategoryModel.find({}).select('name');
-    return res.status(200).json({ message: "success", subCategory });
-}
-
 export const getAllSubCategoryByCategoryId = async (req, res, next) => {
     const { categoryId } = req.params;
-    const category = await categoryModel.findById({ _id:categoryId });
+    const category = await categoryModel.findById({ _id: categoryId });
     if (!category) {
         return next(new AppError("Invalid Category", 404));
 
@@ -47,7 +42,12 @@ export const getAllSubCategoryByCategoryId = async (req, res, next) => {
 }
 
 export const getSubCategoryDetails = async (req, res, next) => {
-    const { id } = req.params;
+    const { categoryId, id } = req.params;
+    const category = await categoryModel.findById({ _id: categoryId });
+    if (!category) {
+        return next(new AppError("Invalid Category", 404));
+
+    }
     const subCategory = await subCategoryModel.findById({ _id: id }).populate([
         {
             path: 'createdBy',
@@ -65,16 +65,23 @@ export const getSubCategoryDetails = async (req, res, next) => {
     if (!subCategory) {
         return next(new AppError("Invalid SubCategory", 404));
     }
-    else {
-        return res.status(200).json({ message: "success", subCategory });
-
+    if (subCategory.categoryId != categoryId) {
+        return next(new AppError("SubCategory does not belong to this Category", 400));
     }
+    return res.status(200).json({ message: "success", subCategory });
+
+
 }
 
 export const updateSubCategory = async (req, res, next) => {
-    const { id } = req.params;
+    const { categoryId, id } = req.params;
     const { name, status } = req.body;
     const updatedBy = req.id;
+    const category = await categoryModel.findById({ _id: categoryId });
+    if (!category) {
+        return next(new AppError("Invalid Category", 404));
+
+    }
     const subCategory = await subCategoryModel.findByIdAndUpdate({ _id: id }, { name, status, updatedBy }, { new: true }).populate([
         {
             path: 'createdBy',
@@ -92,14 +99,19 @@ export const updateSubCategory = async (req, res, next) => {
     if (!subCategory) {
         return next(new AppError("Invalid SubCategory", 404));
     }
-    else {
-        return res.status(200).json({ message: "success", subCategory });
+    if (subCategory.categoryId != categoryId) {
+        return next(new AppError("SubCategory does not belong to this Category", 400));
     }
+    return res.status(200).json({ message: "success", subCategory });
+
 }
 
 export const deleteSubCategory = async (req, res, next) => {
-    const { id } = req.params;
-
+    const { categoryId, id } = req.params;
+    const category = await categoryModel.findById({ _id: categoryId });
+    if (!category) {
+        return next(new AppError("Invalid Category", 404));
+    }
     const subCategory = await subCategoryModel.findByIdAndDelete({ _id: id }).populate([
         {
             path: 'createdBy',
@@ -117,8 +129,10 @@ export const deleteSubCategory = async (req, res, next) => {
     if (!subCategory) {
         return next(new AppError("Invalid SubCategory", 404));
     }
-    else {
-        await cloudinary.uploader.destroy(subCategory.image.public_id);
-        return res.status(200).json({ message: "success", subCategory });
+    if (subCategory.categoryId != categoryId) {
+        return next(new AppError("SubCategory does not belong to this Category", 400));
     }
+    await cloudinary.uploader.destroy(subCategory.image.public_id);
+    return res.status(200).json({ message: "success", subCategory });
+
 }

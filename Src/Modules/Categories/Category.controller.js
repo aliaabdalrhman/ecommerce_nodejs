@@ -27,8 +27,8 @@ export const createCategory = async (req, res, next) => {
         req.body.createdBy = req.id;
         req.body.updatedBy = req.id;
         // If the category doesn't exist, create a new one
-        const category = await categoryModel.create(req.body);
-        return res.status(201).json({ message: "success", category });
+        await categoryModel.create(req.body);
+        return res.status(201).json({ message: "success" });
 
     }
 }

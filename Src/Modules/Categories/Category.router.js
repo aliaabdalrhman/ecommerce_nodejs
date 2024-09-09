@@ -8,8 +8,12 @@ import validation from "../../Middelware/Validation.js";
 import { createCategorySchema, deleteCategorySchema, getCategorySchema, updateCategorySchema } from "./Category.validation.js";
 import { auth } from "../../Middelware/auth.js";
 import { endPoints } from "./Category.role.js";
+import subCategoryRouter from '../SubCategory/SubCategory.router.js'
+
 
 const router = Router(); // Initialize a new router instance
+
+router.use('/:categoryId/subCategory', subCategoryRouter);
 
 // Route to get all categories
 router.get('/', asyncHandler(categoryController.getAllCategories));

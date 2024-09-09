@@ -19,12 +19,16 @@ export const getAllSubCategoryByCategoryIdSchema = {
 export const getSubCategoryDetailsSchema = {
     params: joi.object({
         id: generalFields.id,
+        categoryId: generalFields.id,
+
     })
 }
 
 export const deleteSubCategorySchema = {
     params: joi.object({
         id: generalFields.id,
+        categoryId: generalFields.id,
+
     })
 }
 
@@ -35,5 +39,7 @@ export const updateSubCategorySchema = {
     }),
     params: joi.object({
         id: generalFields.id,
+        categoryId: generalFields.id,
+
     })
 }
