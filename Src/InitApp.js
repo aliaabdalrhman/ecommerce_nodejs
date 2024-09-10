@@ -3,6 +3,7 @@ import { AppError } from "../GlobalError.js";
 import userRouter from "./Modules/Users/User.router.js";
 import categoryRouter from "./Modules/Categories/Category.router.js"
 import authRouter from "./Modules/Auth/Auth.router.js";
+import productRouter from "./Modules/Products/Product.router.js"
 
 const initApp = (app, express) => {
     connectDb();
@@ -10,6 +11,7 @@ const initApp = (app, express) => {
     app.use('/auth', authRouter);
     app.use('/users', userRouter);
     app.use('/categories', categoryRouter);
+    // app.use('/products', productRouter);
     app.get('*', (req, res, next) => {
         return next(new AppError("page not found", 404));
     });

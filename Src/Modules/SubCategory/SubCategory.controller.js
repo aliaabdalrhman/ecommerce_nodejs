@@ -61,11 +61,11 @@ export const getSubCategoryDetails = async (req, res, next) => {
             path: 'categoryId',
             select: 'name'
         }
-    ]);;
+    ]);
     if (!subCategory) {
         return next(new AppError("Invalid SubCategory", 404));
     }
-    if (subCategory.categoryId != categoryId) {
+    if (!subCategory.categoryId.equals(categoryId)) {
         return next(new AppError("SubCategory does not belong to this Category", 400));
     }
     return res.status(200).json({ message: "success", subCategory });
@@ -99,7 +99,7 @@ export const updateSubCategory = async (req, res, next) => {
     if (!subCategory) {
         return next(new AppError("Invalid SubCategory", 404));
     }
-    if (subCategory.categoryId != categoryId) {
+    if (!subCategory.categoryId.equals(categoryId)) {
         return next(new AppError("SubCategory does not belong to this Category", 400));
     }
     return res.status(200).json({ message: "success", subCategory });
@@ -129,7 +129,7 @@ export const deleteSubCategory = async (req, res, next) => {
     if (!subCategory) {
         return next(new AppError("Invalid SubCategory", 404));
     }
-    if (subCategory.categoryId != categoryId) {
+    if (!subCategory.categoryId.equals(categoryId)) {
         return next(new AppError("SubCategory does not belong to this Category", 400));
     }
     await cloudinary.uploader.destroy(subCategory.image.public_id);
