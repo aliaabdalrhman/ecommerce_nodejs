@@ -9,9 +9,20 @@ import { createProductSchema, deleteProductSchema, getAllProductsSchema, getProd
 
 const router = Router({ mergeParams: true });
 
-router.post('/', fileUpload().single('mainImage'), asyncHandler(auth(endPoints.create)), validation(createProductSchema), asyncHandler(productController.createProduct));
-router.get('/', validation(getAllProductsSchema), asyncHandler(productController.getAllProduct));
-router.get('/:id', validation(getProductByIdSchema), asyncHandler(productController.getProductById));
-router.delete('/:id', asyncHandler(auth(endPoints.delete)), validation(deleteProductSchema), asyncHandler(productController.deleteProduct));
+router.post('/',
+    fileUpload().fields([{ name: 'mainImage', maxCount: 1 }, { name: 'subImages', maxCount: 5 }]),
+    asyncHandler(auth(endPoints.create)),
+    validation(createProductSchema),
+    asyncHandler(productController.createProduct));
+
+router.get('/', validation(getAllProductsSchema),
+    asyncHandler(productController.getAllProduct));
+
+router.get('/:id', validation(getProductByIdSchema),
+    asyncHandler(productController.getProductById));
+
+router.delete('/:id', asyncHandler(auth(endPoints.delete)),
+    validation(deleteProductSchema),
+    asyncHandler(productController.deleteProduct));
 
 export default router;

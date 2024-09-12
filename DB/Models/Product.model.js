@@ -21,6 +21,8 @@ const productSchema = new Schema({
     },
     subImages: {
         type: [Object],
+        required: true
+
     },
     price: {
         type: Number,
@@ -49,10 +51,12 @@ const productSchema = new Schema({
     },
     colors: {
         type: [String],
+        required:true
     },
     sizes: {
         type: [String],
         enum: ['xs', 's', 'm', 'l', 'xl'],
+        required:true
     },
     createdBy: {
         type: Types.ObjectId,

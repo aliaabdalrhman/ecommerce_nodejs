@@ -1,4 +1,5 @@
 import categoryModel from "../../../DB/Models/Category.model.js";
+import productModel from "../../../DB/Models/Product.model.js";
 import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
@@ -121,13 +122,29 @@ export const deletCategory = async (req, res, next) => {
                 await cloudinary.uploader.destroy(subCategory.image.public_id);
             }
         }
+        // Find all products associated with the category
+        const products = await productModel.find({ categoryId: id });
+
+        // Loop through each product and delete its main and sub-images from Cloudinary
+        for (const product of products) {
+            // Delete the main image of the product
+            if (product.mainImage && product.mainImage.public_id) {
+                await cloudinary.uploader.destroy(product.mainImage.public_id);
+            }
+
+            // Delete all sub-images of the product
+            if (product.subImages && product.subImages.length > 0) {
+                for (const image of product.subImages) {
+                    await cloudinary.uploader.destroy(image.public_id);
+                }
+            }
+        }
 
         // Delete all subcategories related to the deleted category
         await subCategoryModel.deleteMany({ categoryId: id });
+        await productModel.deleteMany({ categoryId: id });
 
         // If the deletion is successful, return a success message with the deleted category details
         return res.status(200).json({ message: "success", category });
     }
-
-
 }

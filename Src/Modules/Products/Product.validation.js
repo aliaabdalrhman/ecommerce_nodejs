@@ -12,9 +12,10 @@ export const createProductSchema = {
         }),
         price: joi.number().required(),
         stock: joi.number().required(),
+        colors: joi.string().required(),
+        sizes: joi.string().required()
     }),
     params: joi.object({
-        id: generalFields.id,
         categoryId: generalFields.id,
         subCategoryId: generalFields.id
     })

@@ -1,4 +1,5 @@
 import categoryModel from "../../../DB/Models/Category.model.js";
+import productModel from "../../../DB/Models/Product.model.js";
 import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
@@ -108,11 +109,11 @@ export const updateSubCategory = async (req, res, next) => {
 
 export const deleteSubCategory = async (req, res, next) => {
     const { categoryId, id } = req.params;
-    const category = await categoryModel.findById({ _id: categoryId });
+    const category = await categoryModel.findById(categoryId);
     if (!category) {
         return next(new AppError("Invalid Category", 404));
     }
-    const subCategory = await subCategoryModel.findByIdAndDelete({ _id: id }).populate([
+    const subCategory = await subCategoryModel.findByIdAndDelete(id).populate([
         {
             path: 'createdBy',
             select: 'username'
@@ -132,6 +133,21 @@ export const deleteSubCategory = async (req, res, next) => {
     if (!subCategory.categoryId.equals(categoryId)) {
         return next(new AppError("SubCategory does not belong to this Category", 400));
     }
+
+    const products = await productModel.find({ subCategoryId: id });
+
+    for (const product of products) {
+        if (product.mainImage && product.mainImage.public_id) {
+            await cloudinary.uploader.destroy(product.mainImage.public_id);
+        }
+        if (product.subImages && product.subImages.length > 0) {
+            for (const image of product.subImages) {
+                await cloudinary.uploader.destroy(image.public_id);
+            }
+        }
+    }
+
+    await productModel.deleteMany({ subCategoryId: id });
     await cloudinary.uploader.destroy(subCategory.image.public_id);
     return res.status(200).json({ message: "success", subCategory });
 
