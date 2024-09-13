@@ -1,4 +1,4 @@
-import { roles } from "../../Middelware/auth.js";
+import { roles } from "../../Middelware/Auth.js";
 
 export const endPoints = {
     create: [roles.admin],
