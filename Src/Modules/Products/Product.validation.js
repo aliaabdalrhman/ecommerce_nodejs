@@ -10,29 +10,20 @@ export const createProductSchema = {
             'string.max': 'description cannot be more than 100 characters long',
             "string.base": "Description must be a string",
         }),
+        categoryId: generalFields.id,
+        subCategoryId: generalFields.id,
         price: joi.number().required(),
         stock: joi.number().required(),
-        colors: joi.string().required(),
-        sizes: joi.string().required()
+        colors: joi.string().optional(),
+        sizes: joi.string().optional(),
+        discount:joi.number().integer().positive().optional(),
+        
     }),
-    params: joi.object({
-        categoryId: generalFields.id,
-        subCategoryId: generalFields.id
-    })
-}
-
-export const getAllProductsSchema = {
-    params: joi.object({
-        categoryId: generalFields.id,
-        subCategoryId: generalFields.id
-    })
 }
 
 export const getProductByIdSchema = {
     params: joi.object({
         id: generalFields.id,
-        categoryId: generalFields.id,
-        subCategoryId: generalFields.id
     })
 }
 
@@ -40,8 +31,6 @@ export const getProductByIdSchema = {
 export const deleteProductSchema = {
     params: joi.object({
         id: generalFields.id,
-        categoryId: generalFields.id,
-        subCategoryId: generalFields.id
     })
 }
 

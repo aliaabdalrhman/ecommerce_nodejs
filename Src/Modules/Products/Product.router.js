@@ -5,9 +5,9 @@ import fileUpload from "../../Utilities/Multur.js";
 import { auth } from "../../Middelware/Auth.js";
 import { endPoints } from "./Product.role.js";
 import validation from "../../Middelware/Validation.js";
-import { createProductSchema, deleteProductSchema, getAllProductsSchema, getProductByIdSchema } from "./Product.validation.js";
+import { createProductSchema, deleteProductSchema, getProductByIdSchema } from "./Product.validation.js";
 
-const router = Router({ mergeParams: true });
+const router = Router();
 
 router.post('/',
     fileUpload().fields([{ name: 'mainImage', maxCount: 1 }, { name: 'subImages', maxCount: 5 }]),
@@ -15,7 +15,7 @@ router.post('/',
     validation(createProductSchema),
     asyncHandler(productController.createProduct));
 
-router.get('/', validation(getAllProductsSchema),
+router.get('/',
     asyncHandler(productController.getAllProduct));
 
 router.get('/:id', validation(getProductByIdSchema),
