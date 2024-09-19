@@ -61,3 +61,20 @@ export const removeItem = async (req, res, next) => {
     return res.status(200).json({ message: "success" });
 }
 
+export const clearCart = async (req, res, next) => {
+    const userId = req.id;
+    const cart = await cartModel.findOne({ userId });
+    if (!cart) {
+        return next(new AppError("Cart not found", 404));
+    }
+    if (cart.products.length === 0) {
+        return res.status(200).json({ message: "Cart is already empty" });
+    }
+    await cartModel.findOneAndUpdate(
+        { userId },
+        { $set: { products: [] } },
+        { new: true }
+    );
+    return res.status(200).json({ message: "success" });
+}
+
