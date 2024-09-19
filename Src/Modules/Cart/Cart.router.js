@@ -16,8 +16,10 @@ router.delete('/', asyncHandler(auth(endPoints.delete)),
     validation(removeItem),
     asyncHandler(cartController.removeItem));
 
-    router.delete('/clearCart', asyncHandler(auth(endPoints.delete)),
+router.delete('/clearCart', asyncHandler(auth(endPoints.delete)),
     asyncHandler(cartController.clearCart));
 
+router.get('/', asyncHandler(auth(endPoints.get)),
+    asyncHandler(cartController.getCart));
 
 export default router;
