@@ -12,3 +12,18 @@ export const removeItem = {
         productId: generalFields.id,
     })
 }
+
+export const increaseQty = {
+    body: joi.object({
+        productId: generalFields.id,
+    })
+}
+
+export const decreaseQty = {
+    body: joi.object({
+        productId: generalFields.id,
+    })
+}
+
+
+

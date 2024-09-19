@@ -87,3 +87,51 @@ export const getCart = async (req, res, next) => {
     return res.status(200).json({ message: "success", cart });
 }
 
+export const increaseQty = async (req, res, next) => {
+    const userId = req.id;
+    const { productId } = req.body;
+    const product = await productModel.findById(productId);
+    if (!product) {
+        return next(new AppError("Invalid product", 404));
+    }
+    const cart = await cartModel.findOne({ userId });
+    if (!cart) {
+        return next(new AppError("Cart not found", 404));
+    }
+    const productInCart = cart.products.find(p => p.productId.toString() === productId);
+    if (!productInCart) {
+        return next(new AppError("Product not found in cart", 404));
+    }
+    const newCart = await cartModel.findOneAndUpdate(
+        { userId, 'products.productId': productId },
+        { $inc: { 'products.$.quantity': 1 } },
+        { new: true }
+    );
+    return res.status(200).json({ message: "success", cart: newCart });
+}
+
+export const decreaseQty = async (req, res, next) => {
+    const userId = req.id;
+    const { productId } = req.body;
+    const product = await productModel.findById(productId);
+    if (!product) {
+        return next(new AppError("Invalid product", 404));
+    }
+    const cart = await cartModel.findOne({ userId });
+    if (!cart) {
+        return next(new AppError("Cart not found", 404));
+    }
+    const productInCart = cart.products.find(p => p.productId.toString() === productId);
+    if (!productInCart) {
+        return next(new AppError("Product not found in cart", 404));
+    }
+    if (productInCart.quantity <= 1) {
+        return next(new AppError("Quantity cannot be reduced below 1", 400));
+    }
+    const newCart = await cartModel.findOneAndUpdate(
+        { userId, 'products.productId': productId },
+        { $inc: { 'products.$.quantity': -1 } },
+        { new: true }
+    );
+    return res.status(200).json({ message: "success", cart: newCart });
+}
