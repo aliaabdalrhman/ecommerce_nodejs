@@ -6,3 +6,9 @@ export const addToCart = {
         productId: generalFields.id,
     })
 }
+
+export const removeItem = {
+    body: joi.object({
+        productId: generalFields.id,
+    })
+}

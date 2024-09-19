@@ -38,3 +38,26 @@ export const addToCart = async (req, res, next) => {
     }
 }
 
+export const removeItem = async (req, res, next) => {
+    const userId = req.id;
+    const { productId } = req.body;
+    const product = await productModel.findById(productId);
+    if (!product) {
+        return next(new AppError("Invalid product", 404));
+    }
+    const cart = await cartModel.findOne({ userId });
+    if (!cart) {
+        return next(new AppError("Cart not found", 404));
+    }
+    const productExists = cart.products.some(p => p.productId.toString() === productId);
+    if (!productExists) {
+        return next(new AppError("Product not found in cart", 404));
+    }
+    await cartModel.findOneAndUpdate(
+        { userId },
+        { $pull: { products: { productId } } },
+        { new: true }
+    );
+    return res.status(200).json({ message: "success" });
+}
+
