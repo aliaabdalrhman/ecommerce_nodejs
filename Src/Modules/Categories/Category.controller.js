@@ -2,6 +2,7 @@ import categoryModel from "../../../DB/Models/Category.model.js";
 import productModel from "../../../DB/Models/Product.model.js";
 import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
+import { AppSuccess } from "../../../GlobalSuccess.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
 
 // get all category
@@ -9,7 +10,7 @@ export const getAllCategories = async (rea, res, next) => {
     // Retrieve all categories from the database, selecting only the 'name' field
     const categories = await categoryModel.find({}).select('name');
     // Return the list of categories in the response with a success message
-    return res.status(200).json({ message: "success", categories });
+    return next(new AppSuccess("success", 200, { categories }));
 }
 
 // create category 
@@ -29,8 +30,7 @@ export const createCategory = async (req, res, next) => {
         req.body.updatedBy = req.id;
         // If the category doesn't exist, create a new one
         await categoryModel.create(req.body);
-        return res.status(201).json({ message: "success" });
-
+        return next(new AppSuccess("success", 201));
     }
 }
 
@@ -57,7 +57,7 @@ export const getCategoryDetails = async (req, res, next) => {
             }
         ]);
         // Return the category details in the response with a success message
-        return res.status(200).json({ message: "success", category: CategoryDetails });
+        return next(new AppSuccess("success", 200, { category: CategoryDetails }));
     }
 }
 
@@ -86,7 +86,7 @@ export const updateCategory = async (req, res, next) => {
         return next(new AppError('Invalid category', 404)); // Handle invalid category ID with a custom error
     } else {
         // If the update is successful, return the updated category with a success message
-        return res.status(200).json({ message: "success", category });
+        return next(new AppSuccess("success", 200, { category }));
     }
 }
 
@@ -145,6 +145,6 @@ export const deletCategory = async (req, res, next) => {
         await productModel.deleteMany({ categoryId: id });
 
         // If the deletion is successful, return a success message with the deleted category details
-        return res.status(200).json({ message: "success", category });
+        return next(new AppSuccess("success", 200, { category }));
     }
 }

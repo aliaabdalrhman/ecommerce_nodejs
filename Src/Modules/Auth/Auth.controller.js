@@ -3,6 +3,7 @@ import { AppError } from "../../../GlobalError.js";
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../../Utilities/SendEmail.js";
+import { AppSuccess } from "../../../GlobalSuccess.js";
 
 export const register = async (req, res, next) => {
     const { username, email, password, cpassword } = req.body;
@@ -80,14 +81,14 @@ export const register = async (req, res, next) => {
         sendEmail(email, "Welcome to ecommerce", html);
         await userModel.create({ username, email, password: hashedPassword });
     }
-    return res.status(201).json({ message: "success" });
+    return next(new AppSuccess("success", 201));
 }
 
 export const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await userModel.findOne({ email });
     if (!user) {
-        return next(new AppError("Invalid email ", 401));
+        return next(new AppError("Invalid email", 401));
     }
     else {
         const isValidPassword = await bcrypt.compare(password, user.password);
@@ -96,7 +97,7 @@ export const login = async (req, res, next) => {
         }
         else {
             const token = jwt.sign({ id: user._id }, process.env.LOGINSIGNATURE, { expiresIn: "24h" });
-            return res.status(200).json({ message: "success", token });
+            return next(new AppSuccess("success", 200, { token }));
         }
     }
 };

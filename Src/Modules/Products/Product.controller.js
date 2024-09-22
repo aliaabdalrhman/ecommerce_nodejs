@@ -2,6 +2,7 @@ import categoryModel from "../../../DB/Models/Category.model.js";
 import productModel from "../../../DB/Models/Product.model.js";
 import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
+import { AppSuccess } from "../../../GlobalSuccess.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
 
 export const createProduct = async (req, res, next) => {
@@ -46,7 +47,7 @@ export const createProduct = async (req, res, next) => {
 
     let priceAfterDiscount = price - (price * (discount || 0) / 100);
 
-    const products = await productModel.create({
+     await productModel.create({
         name: req.body.name,
         description,
         price,
@@ -62,12 +63,12 @@ export const createProduct = async (req, res, next) => {
         categoryId,
         subCategoryId
     })
-    return res.status(201).json({ message: "success", products });
+    return next(new AppSuccess("success", 201));
 };
 
 export const getAllProduct = async (req, res, next) => {
     const products = await productModel.find().select("name");
-    return res.status(200).json({ message: "success", products });
+    return next(new AppSuccess("success", 200, { products }));
 }
 
 export const getProductById = async (req, res, next) => {
@@ -93,8 +94,7 @@ export const getProductById = async (req, res, next) => {
     if (!product) {
         return next(new AppError("Invalid Product", 404));
     }
-    return res.status(200).json({ message: "success", product });
-
+    return next(new AppSuccess("success", 200, { product }));
 }
 
 export const deleteProduct = async (req, res, next) => {
@@ -125,6 +125,5 @@ export const deleteProduct = async (req, res, next) => {
     for (const image of product.subImages) {
         await cloudinary.uploader.destroy(image.public_id);
     }
-
-    return res.status(200).json({ message: "success", product });
+    return next(new AppSuccess("success", 200, { product }));
 }

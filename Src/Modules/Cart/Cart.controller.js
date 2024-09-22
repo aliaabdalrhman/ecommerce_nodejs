@@ -1,6 +1,8 @@
 import cartModel from "../../../DB/Models/Cart.model.js";
 import productModel from "../../../DB/Models/Product.model.js";
 import { AppError } from "../../../GlobalError.js";
+import { AppSuccess } from "../../../GlobalSuccess.js";
+
 
 export const createCart = async (req, res, next) => {
     const userId = req.id;
@@ -9,8 +11,8 @@ export const createCart = async (req, res, next) => {
     if (!product) {
         return next(new AppError("Invalid product", 404));
     }
-    const cart = await cartModel.create({ userId, products: [{ productId }] });
-    return res.status(201).json({ message: "success", cart });
+    await cartModel.create({ userId, products: [{ productId }] });
+    return next(new AppSuccess("success", 201));
 }
 
 export const addToCart = async (req, res, next) => {
@@ -26,12 +28,12 @@ export const addToCart = async (req, res, next) => {
         if (productExists) {
             return next(new AppError("product already exists in cart", 400));
         }
-        const newCart = await cartModel.findOneAndUpdate({ userId },
+        await cartModel.findOneAndUpdate({ userId },
             {
                 $push: { products: { productId } }
             },
             { new: true });
-        return res.status(201).json({ message: "success", cart: newCart });
+        return next(new AppSuccess("success", 201));
     }
     else {
         return await createCart(req, res, next);
@@ -58,7 +60,7 @@ export const removeItem = async (req, res, next) => {
         { $pull: { products: { productId } } },
         { new: true }
     );
-    return res.status(200).json({ message: "success" });
+    return next(new AppSuccess("success", 200));
 }
 
 export const clearCart = async (req, res, next) => {
@@ -68,14 +70,14 @@ export const clearCart = async (req, res, next) => {
         return next(new AppError("Cart not found", 404));
     }
     if (cart.products.length === 0) {
-        return res.status(200).json({ message: "Cart is already empty" });
+        return next(new AppSuccess("Cart is already empty", 200));
     }
     await cartModel.findOneAndUpdate(
         { userId },
         { $set: { products: [] } },
         { new: true }
     );
-    return res.status(200).json({ message: "success" });
+    return next(new AppSuccess("success", 200));
 }
 
 export const getCart = async (req, res, next) => {
@@ -84,7 +86,7 @@ export const getCart = async (req, res, next) => {
     if (!cart) {
         return next(new AppError("Cart not found", 404));
     }
-    return res.status(200).json({ message: "success", cart });
+    return next(new AppSuccess("success", 200, { cart }));
 }
 
 export const increaseQty = async (req, res, next) => {
@@ -102,12 +104,12 @@ export const increaseQty = async (req, res, next) => {
     if (!productInCart) {
         return next(new AppError("Product not found in cart", 404));
     }
-    const newCart = await cartModel.findOneAndUpdate(
+    await cartModel.findOneAndUpdate(
         { userId, 'products.productId': productId },
         { $inc: { 'products.$.quantity': 1 } },
         { new: true }
     );
-    return res.status(200).json({ message: "success", cart: newCart });
+    return next(new AppSuccess("success", 200));
 }
 
 export const decreaseQty = async (req, res, next) => {
@@ -128,10 +130,10 @@ export const decreaseQty = async (req, res, next) => {
     if (productInCart.quantity <= 1) {
         return next(new AppError("Quantity cannot be reduced below 1", 400));
     }
-    const newCart = await cartModel.findOneAndUpdate(
+    await cartModel.findOneAndUpdate(
         { userId, 'products.productId': productId },
         { $inc: { 'products.$.quantity': -1 } },
         { new: true }
     );
-    return res.status(200).json({ message: "success", cart: newCart });
+    return next(new AppSuccess("success", 200));
 }

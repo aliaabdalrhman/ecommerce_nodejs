@@ -37,7 +37,7 @@ const validation = (schema) => {
             }
         });
         if (validationArray.length > 0) {
-            res.status(400).json({ message: validationArray });
+            return res.status(400).json({ message: 'Validation failed', errors: validationArray });
         }
         else {
             next();

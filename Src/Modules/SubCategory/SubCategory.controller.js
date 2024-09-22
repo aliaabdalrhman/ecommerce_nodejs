@@ -2,6 +2,7 @@ import categoryModel from "../../../DB/Models/Category.model.js";
 import productModel from "../../../DB/Models/Product.model.js";
 import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
+import { AppSuccess } from "../../../GlobalSuccess.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
 
 export const createSubCategory = async (req, res, next) => {
@@ -20,7 +21,7 @@ export const createSubCategory = async (req, res, next) => {
         else {
             const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `${process.env.APPNAME}/subCategory` });
             await subCategoryModel.create({ name: req.body.name, image: { secure_url, public_id }, createdBy: req.id, updatedBy: req.id, categoryId });
-            return res.status(201).json({ message: "success" });
+            return next(new AppSuccess("success", 201));
         }
     }
 
@@ -38,7 +39,7 @@ export const getAllSubCategoryByCategoryId = async (req, res, next) => {
         return next(new AppError("Invalid SubCategory", 404));
     }
     else {
-        return res.status(200).json({ message: "success", subCategory });
+        return next(new AppSuccess("success", 200, { subCategory }));
     }
 }
 
@@ -69,9 +70,7 @@ export const getSubCategoryDetails = async (req, res, next) => {
     if (!subCategory.categoryId.equals(categoryId)) {
         return next(new AppError("SubCategory does not belong to this Category", 400));
     }
-    return res.status(200).json({ message: "success", subCategory });
-
-
+    return next(new AppSuccess("success", 200, { subCategory }));
 }
 
 export const updateSubCategory = async (req, res, next) => {
@@ -103,8 +102,7 @@ export const updateSubCategory = async (req, res, next) => {
     if (!subCategory.categoryId.equals(categoryId)) {
         return next(new AppError("SubCategory does not belong to this Category", 400));
     }
-    return res.status(200).json({ message: "success", subCategory });
-
+    return next(new AppSuccess("success", 200, { subCategory }));
 }
 
 export const deleteSubCategory = async (req, res, next) => {
@@ -149,6 +147,5 @@ export const deleteSubCategory = async (req, res, next) => {
 
     await productModel.deleteMany({ subCategoryId: id });
     await cloudinary.uploader.destroy(subCategory.image.public_id);
-    return res.status(200).json({ message: "success", subCategory });
-
+    return next(new AppSuccess("success", 200, { subCategory }));
 }
