@@ -47,7 +47,7 @@ export const createProduct = async (req, res, next) => {
 
     let priceAfterDiscount = price - (price * (discount || 0) / 100);
 
-     await productModel.create({
+    await productModel.create({
         name: req.body.name,
         description,
         price,
@@ -120,10 +120,14 @@ export const deleteProduct = async (req, res, next) => {
     if (!product) {
         return next(new AppError("Invalid product", 404));
     }
-    await cloudinary.uploader.destroy(product.mainImage.public_id);
+    const subImagesFolder = `${process.env.APPNAME}/Products/${product.name}/subImages`;
+    await cloudinary.api.delete_resources_by_prefix(subImagesFolder);
 
-    for (const image of product.subImages) {
-        await cloudinary.uploader.destroy(image.public_id);
-    }
+    const mainImageFolder = `${process.env.APPNAME}/Products/${product.name}`;
+    await cloudinary.api.delete_resources_by_prefix(mainImageFolder);
+
+    await cloudinary.api.delete_folder(subImagesFolder);
+    await cloudinary.api.delete_folder(mainImageFolder);
+
     return next(new AppSuccess("success", 200, { product }));
 }
