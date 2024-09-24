@@ -22,3 +22,19 @@ export const loginSchema = {
         password: generalFields.password,
     })
 }
+
+export const sendCodeSchema = {
+    body: joi.object({
+        email: generalFields.email,
+    })
+}
+
+export const forgotPasswordSchema = {
+    body: joi.object({
+        email: generalFields.email,
+        password: generalFields.password,
+        code: joi.string().length(6).required().messages({
+            "string.length": "code must be 6 characters long",
+        })
+    })
+}
