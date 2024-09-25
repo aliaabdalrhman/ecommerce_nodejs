@@ -8,22 +8,20 @@ export const addToCart = {
 }
 
 export const removeItem = {
-    body: joi.object({
+    params: joi.object({
         productId: generalFields.id,
     })
 }
 
 export const increaseQty = {
-    body: joi.object({
+    params: joi.object({
         productId: generalFields.id,
     })
 }
 
 export const decreaseQty = {
-    body: joi.object({
+    params: joi.object({
         productId: generalFields.id,
     })
 }
-
-
 

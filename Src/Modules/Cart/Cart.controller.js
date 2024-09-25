@@ -42,7 +42,7 @@ export const addToCart = async (req, res, next) => {
 
 export const removeItem = async (req, res, next) => {
     const userId = req.id;
-    const { productId } = req.body;
+    const { productId } = req.params;
     const product = await productModel.findById(productId);
     if (!product) {
         return next(new AppError("Invalid product", 404));
@@ -86,12 +86,12 @@ export const getCart = async (req, res, next) => {
     if (!cart) {
         return next(new AppError("Cart not found", 404));
     }
-    return next(new AppSuccess("success", 200, { cart }));
+    return next(new AppSuccess("success", 200, { products: cart.products }));
 }
 
 export const increaseQty = async (req, res, next) => {
     const userId = req.id;
-    const { productId } = req.body;
+    const { productId } = req.params;
     const product = await productModel.findById(productId);
     if (!product) {
         return next(new AppError("Invalid product", 404));
@@ -114,7 +114,7 @@ export const increaseQty = async (req, res, next) => {
 
 export const decreaseQty = async (req, res, next) => {
     const userId = req.id;
-    const { productId } = req.body;
+    const { productId } = req.params;
     const product = await productModel.findById(productId);
     if (!product) {
         return next(new AppError("Invalid product", 404));

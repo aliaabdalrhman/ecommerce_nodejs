@@ -12,7 +12,7 @@ router.post('/', asyncHandler(auth(endPoints.add)),
     validation(addToCart),
     asyncHandler(cartController.addToCart));
 
-router.delete('/', asyncHandler(auth(endPoints.delete)),
+router.delete('/:productId', asyncHandler(auth(endPoints.delete)),
     validation(removeItem),
     asyncHandler(cartController.removeItem));
 
@@ -22,12 +22,12 @@ router.delete('/clearCart', asyncHandler(auth(endPoints.delete)),
 router.get('/', asyncHandler(auth(endPoints.get)),
     asyncHandler(cartController.getCart));
 
-router.put('/increase', asyncHandler(auth(endPoints.update)),
+router.put('/increase/:productId', asyncHandler(auth(endPoints.update)),
     validation(increaseQty),
     asyncHandler(cartController.increaseQty));
 
-router.put('/decrease', asyncHandler(auth(endPoints.update)),
+router.put('/decrease/:productId', asyncHandler(auth(endPoints.update)),
     validation(decreaseQty),
     asyncHandler(cartController.decreaseQty));
-    
+
 export default router;
