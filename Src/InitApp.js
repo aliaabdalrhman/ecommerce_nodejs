@@ -5,7 +5,7 @@ import categoryRouter from "./Modules/Categories/Category.router.js"
 import productRouter from "./Modules/Products/Product.router.js"
 import cartRouter from "./Modules/Cart/Cart.router.js"
 import authRouter from "./Modules/Auth/Auth.router.js";
-import { AppSuccess } from "../GlobalSuccess.js";
+import couponRouter from "./Modules/Coupon/Coupon.router.js";
 
 const initApp = (app, express) => {
     connectDb();
@@ -14,7 +14,8 @@ const initApp = (app, express) => {
     app.use('/users', userRouter);
     app.use('/categories', categoryRouter);
     app.use('/products', productRouter);
-    app.use('/cart', cartRouter)
+    app.use('/cart', cartRouter);
+    app.use('/coupon',couponRouter)
 
     app.get('*', (req, res, next) => {
         return next(new AppError("page not found", 404));
