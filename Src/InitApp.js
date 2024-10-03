@@ -6,6 +6,7 @@ import productRouter from "./Modules/Products/Product.router.js"
 import cartRouter from "./Modules/Cart/Cart.router.js"
 import authRouter from "./Modules/Auth/Auth.router.js";
 import couponRouter from "./Modules/Coupon/Coupon.router.js";
+import orderRouter from "./Modules/Order/Order.router.js";
 
 const initApp = (app, express) => {
     connectDb();
@@ -15,8 +16,8 @@ const initApp = (app, express) => {
     app.use('/categories', categoryRouter);
     app.use('/products', productRouter);
     app.use('/cart', cartRouter);
-    app.use('/coupon',couponRouter)
-
+    app.use('/coupon', couponRouter);
+    app.use('/order', orderRouter);
     app.get('*', (req, res, next) => {
         return next(new AppError("page not found", 404));
     });

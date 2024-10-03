@@ -51,12 +51,12 @@ const productSchema = new Schema({
     },
     colors: {
         type: [String],
-        required:true
+        required: true
     },
     sizes: {
         type: [String],
         enum: ['xs', 's', 'm', 'l', 'xl'],
-        required:true
+        required: true
     },
     createdBy: {
         type: Types.ObjectId,

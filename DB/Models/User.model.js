@@ -22,6 +22,10 @@ const userSchema = new Schema({
     address: {
         type: String
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     confirmEmail: {
         type: Boolean,
     },
@@ -40,9 +44,9 @@ const userSchema = new Schema({
         enum: ['Admin', 'User'],
         default: 'User'
     },
-    sendCode:{
-        type:String,
-        default:null
+    sendCode: {
+        type: String,
+        default: null
     }
 },
     {
