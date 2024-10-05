@@ -15,10 +15,14 @@ export const register = async (req, res, next) => {
     }
     else {
         const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUND));
+        const token = jwt.sign({ email }, process.env.LOGINSIGNATURE, { expiresIn: '24h' });
         const html = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge">
             <title>Welcome Email</title>
             <style>
                 body {
@@ -46,8 +50,16 @@ export const register = async (req, res, next) => {
                     padding: 20px;
                     color: #333333;
                     line-height: 1.6;
-                    border:1px solid #007bff;
-                    border-radius: 0px 0px 10px 10px;
+                    border: 1px solid #007bff;
+                    border-radius: 0 0 10px 10px;
+                }
+                .email-body p {
+                    margin: 10px 0;
+                }
+                .email-body a {
+                    color: #007bff;
+                    text-decoration: none;
+                    font-weight: bold;
                 }
                 .email-footer {
                     text-align: center;
@@ -61,29 +73,37 @@ export const register = async (req, res, next) => {
                 }
             </style>
         </head>
-       <body>
-    <div class="email-container">
-        <div class="email-header">
-            <h1>Welcome to Alia'a Store !</h1>
-        </div>
-        <div class="email-body">
-            <p>Dear ${username},</p>
-            <p>Thank you for joining Alia'a Store ! We’re excited to have you as part of our growing community. Now that you're a member, we hope you enjoy exploring our products and taking advantage of exclusive deals tailored just for you.</p>
-            <p>If you ever have any questions or need support, don’t hesitate to get in touch with our team. We’re always here to help!</p>
-            <p>Warm regards,<br>The Alia'a Store Support Team</p>
-        </div>
-        <div class="email-footer">
-            <p>&copy; 2024 Alia'a Store. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    <h1>Welcome to Alia'a Store!</h1>
+                </div>
+                <div class="email-body">
+                    <p>Dear ${username},</p>
+                    <p>Thank you for joining <strong>Alia'a Store</strong>! We’re thrilled to have you as part of our growing community. Now that you're a member, we hope you enjoy discovering our products and benefiting from exclusive offers just for you.</p>
+                    <p>If you ever need assistance or have any questions, feel free to reach out to our support team. We're always here to help!</p>
+                    <p><a href="http://localhost:3000/auth/confirmEmail/${token}">Please confirm your email</a></p>
+                    <p>Warm regards,<br><strong>The Alia'a Store Support Team</strong></p>
+                </div>
+                <div class="email-footer">
+                    <p>&copy; 2024 Alia'a Store. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
         </html>
     `;
-        sendEmail(email, "Welcome to ecommerce", html);
+
+        sendEmail(email, "Welcome to ecommerce ... confirm email", html);
         await userModel.create({ username, email, password: hashedPassword });
     }
     return next(new AppSuccess("success", 201));
+}
+
+export const confirmEmail = async (req, res, next) => {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, process.env.LOGINSIGNATURE);
+    await userModel.findOneAndUpdate({ email: decoded.email }, { confirmEmail: true });
+    return next(new AppSuccess("success", 200));
 }
 
 export const login = async (req, res, next) => {
@@ -204,3 +224,4 @@ export const forgotPassword = async (req, res, next) => {
     user.save();
     return next(new AppSuccess("success", 200));
 }
+

@@ -9,7 +9,7 @@ export async function sendEmail(to,subject,html) {
         },
     });
     const info = await transporter.sendMail({
-        from: `Alia'a Abdalrhman <${process.env.EMAILSENDER}>`,
+        from: `Alia'a Store <${process.env.EMAILSENDER}>`,
         to,
         subject,
         html,

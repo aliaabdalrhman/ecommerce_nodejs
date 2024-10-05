@@ -28,6 +28,7 @@ const userSchema = new Schema({
     },
     confirmEmail: {
         type: Boolean,
+        default: false
     },
     gender: {
         type: String,
