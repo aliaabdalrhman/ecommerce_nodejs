@@ -4,7 +4,6 @@ import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../../Utilities/SendEmail.js";
 import { AppSuccess } from "../../../GlobalSuccess.js";
-import { nanoid } from 'nanoid'
 import { customAlphabet } from 'nanoid/non-secure'
 
 export const register = async (req, res, next) => {
@@ -13,16 +12,15 @@ export const register = async (req, res, next) => {
     if (user) {
         return next(new AppError("Email already exists", 409));
     }
-    else {
-        const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUND));
-        const token = jwt.sign({ email }, process.env.LOGINSIGNATURE, { expiresIn: '24h' });
-        const html = `
+
+    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUND));
+    const token = jwt.sign({ email }, process.env.LOGINSIGNATURE, { expiresIn: '24h' });
+    const html = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="X-UA-Compatible" content="ie=edge">
             <title>Welcome Email</title>
             <style>
                 body {
@@ -82,7 +80,7 @@ export const register = async (req, res, next) => {
                     <p>Dear ${username},</p>
                     <p>Thank you for joining <strong>Alia'a Store</strong>! We’re thrilled to have you as part of our growing community. Now that you're a member, we hope you enjoy discovering our products and benefiting from exclusive offers just for you.</p>
                     <p>If you ever need assistance or have any questions, feel free to reach out to our support team. We're always here to help!</p>
-                    <p><a href="${process.env.URL}/auth/confirmEmail/${token}">Please confirm your email</a></p>
+                     <p><a href='${process.env.URL}/auth/confirmEmail/${token}'>Please confirm your email</a></p>
                     <p>Warm regards,<br><strong>The Alia'a Store Support Team</strong></p>
                 </div>
                 <div class="email-footer">
@@ -92,18 +90,23 @@ export const register = async (req, res, next) => {
         </body>
         </html>
     `;
-
-        sendEmail(email, "Welcome to ecommerce ... confirm email", html);
-        await userModel.create({ username, email, password: hashedPassword });
-    }
+    sendEmail(email, "Welcome to ecommerce ... confirm email", html);
+    await userModel.create({ username, email, password: hashedPassword });
     return next(new AppSuccess("success", 201));
 }
 
 export const confirmEmail = async (req, res, next) => {
     const { token } = req.params;
     const decoded = jwt.verify(token, process.env.LOGINSIGNATURE);
+    const user = await userModel.findOne({ email: decoded.email });
+    if (!user) {
+        return next(new AppError("User not found", 404));
+    }
+    if (user.confirmEmail) {
+        return next(new AppSuccess("Email is already confirmed", 200));
+    }
     await userModel.findOneAndUpdate({ email: decoded.email }, { confirmEmail: true });
-    return next(new AppSuccess("success", 200));
+    return next(new AppSuccess("confirm email is success", 200));
 }
 
 export const login = async (req, res, next) => {
@@ -117,10 +120,12 @@ export const login = async (req, res, next) => {
         if (!isValidPassword) {
             return next(new AppError("Invalid password", 401));
         }
-        else {
-            const token = jwt.sign({ id: user._id }, process.env.LOGINSIGNATURE, { expiresIn: "24h" });
-            return next(new AppSuccess("success", 200, { token }));
+        if (!user.confirmEmail) {
+            return next(new AppError("Email is not confirmed", 401));
         }
+        const token = jwt.sign({ id: user._id }, process.env.LOGINSIGNATURE, { expiresIn: "24h" });
+        return next(new AppSuccess("success", 200, { token }));
+
     }
 };
 
