@@ -6,8 +6,11 @@ import { auth } from "../../Middelware/Auth.js";
 import { endPoints } from "./Product.role.js";
 import validation from "../../Middelware/Validation.js";
 import { createProductSchema, deleteProductSchema, getProductByIdSchema } from "./Product.validation.js";
+import reviewRouter from "../Reviews/Review.router.js";
 
 const router = Router();
+
+router.use('/:productId/review', reviewRouter);
 
 router.post('/',
     fileUpload().fields([{ name: 'mainImage', maxCount: 1 }, { name: 'subImages', maxCount: 5 }]),
@@ -23,6 +26,7 @@ router.get('/:id', validation(getProductByIdSchema),
 
 router.delete('/:id', asyncHandler(auth(endPoints.delete)),
     validation(deleteProductSchema),
+
     asyncHandler(productController.deleteProduct));
 
 export default router;
