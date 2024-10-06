@@ -81,7 +81,7 @@ export const register = async (req, res, next) => {
                     <p>Dear ${username},</p>
                     <p>Thank you for joining <strong>Alia'a Store</strong>! We’re thrilled to have you as part of our growing community. Now that you're a member, we hope you enjoy discovering our products and benefiting from exclusive offers just for you.</p>
                     <p>If you ever need assistance or have any questions, feel free to reach out to our support team. We're always here to help!</p>
-                     <p><a href="${process.env.URL}/auth/confirmEmail/${token}">Please confirm your email</a></p>
+                     <p><a href='http://localhost:3000/auth/confirmEmail/${token}'>Please confirm your email</a></p>
                     <p>Warm regards,<br><strong>The Alia'a Store Support Team</strong></p>
                 </div>
                 <div class="email-footer">
@@ -92,7 +92,7 @@ export const register = async (req, res, next) => {
         </html>
     `;
     await sendEmail(email, "Welcome to ecommerce ... confirm email", html);
-    return next(new AppSuccess("success", 201, { token }));
+    return next(new AppSuccess("success", 201));
 }
 
 export const confirmEmail = async (req, res, next) => {
