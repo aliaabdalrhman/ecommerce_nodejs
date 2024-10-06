@@ -1,5 +1,4 @@
-import { object } from "joi";
-import Schema, { model, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 const reviewSchema = new Schema({
     comment: {
@@ -24,7 +23,7 @@ const reviewSchema = new Schema({
         required: true
     },
     image: {
-        type: object
+        type: Object,
     }
 }, {
     timestamp: true

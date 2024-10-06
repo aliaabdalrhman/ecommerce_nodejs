@@ -10,7 +10,7 @@ router.post('/register', asyncHandler(validation(registerSchema)), asyncHandler(
 router.post('/login', asyncHandler(validation(loginSchema)), asyncHandler(authController.login));
 router.put('/sendCode', asyncHandler(validation(sendCodeSchema)), asyncHandler(authController.sendCode));
 router.put('/forgotPassword', asyncHandler(validation(forgotPasswordSchema)), asyncHandler(authController.forgotPassword));
-router.post('/confirmEmail/:token', asyncHandler(authController.confirmEmail));
+router.get('/confirmEmail/:token', asyncHandler(authController.confirmEmail));
 
 
 export default router;

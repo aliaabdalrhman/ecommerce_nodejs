@@ -14,6 +14,7 @@ export const register = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUND));
+    await userModel.create({ username, email, password: hashedPassword });
     const token = jwt.sign({ email }, process.env.LOGINSIGNATURE, { expiresIn: '24h' });
     const html = `
         <!DOCTYPE html>
@@ -90,9 +91,8 @@ export const register = async (req, res, next) => {
         </body>
         </html>
     `;
-    sendEmail(email, "Welcome to ecommerce ... confirm email", html);
-    await userModel.create({ username, email, password: hashedPassword });
-    return next(new AppSuccess("success", 201));
+    await sendEmail(email, "Welcome to ecommerce ... confirm email", html);
+    return next(new AppSuccess("success", 201, { token }));
 }
 
 export const confirmEmail = async (req, res, next) => {
@@ -105,7 +105,7 @@ export const confirmEmail = async (req, res, next) => {
     if (user.confirmEmail) {
         return next(new AppSuccess("Email is already confirmed", 200));
     }
-    await userModel.findOneAndUpdate({ email: decoded.email }, { confirmEmail: true });
+    await userModel.updateOne({ email: decoded.email }, { confirmEmail: true });
     return next(new AppSuccess("confirm email is success", 200));
 }
 
