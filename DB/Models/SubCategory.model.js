@@ -10,6 +10,10 @@ const subCategorySchema = new Schema({
         type: Object,
         required: true
     },
+    slug: {
+        type: String,
+        required: true,
+    },
     status: {
         type: String,
         enum: ['Active', 'InActive'],

@@ -4,6 +4,8 @@ import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
 import { AppSuccess } from "../../../GlobalSuccess.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
+import slugify from "slugify";
+import { pagination } from "../../Utilities/Pagination.js";
 
 export const createProduct = async (req, res, next) => {
     const { price, description, stock, colors, sizes, categoryId, subCategoryId, discount } = req.body;
@@ -46,11 +48,12 @@ export const createProduct = async (req, res, next) => {
     }
 
     let priceAfterDiscount = price - (price * (discount || 0) / 100);
-
+    req.body.slug = slugify(req.body.name);
     await productModel.create({
         name: req.body.name,
         description,
         price,
+        slug: req.body.slug,
         discount,
         priceAfterDiscount,
         stock,
@@ -67,8 +70,38 @@ export const createProduct = async (req, res, next) => {
 };
 
 export const getAllProduct = async (req, res, next) => {
-    const products = await productModel.find().select("name");
-    return next(new AppSuccess("success", 200, { products }));
+    const { skip, limit } = pagination(req.query.page, req.query.limit);
+    let queryObject = { ...req.query };
+    const execQuery = ['skip', 'limit', 'page', 'sort', 'search', 'fileds'];
+    execQuery.map((ele) => {
+        delete queryObject[ele];
+    });
+    queryObject = JSON.stringify(queryObject);
+    queryObject = queryObject.replace(/lt|lte|gt|gte|in|nin|neq|eq/g, match => `$${match}`);
+    queryObject = JSON.parse(queryObject);
+    const mongooseQuery = productModel.find(queryObject).limit(limit).skip(skip);
+    if (req.query.search) {
+        mongooseQuery.find({
+            $or: [
+                { name: { $regex: (req.query.search), $options: 'i' } },
+                { description: { $regex: (req.query.search), $options: 'i' } }
+            ]
+        })
+    }
+    const count = await productModel.estimatedDocumentCount();
+    mongooseQuery.select(req.query.fileds?.replaceAll(',', ' '));
+    let products = await mongooseQuery.sort(req.query.sort);
+
+    products = products.map(product => {
+        return {
+           ...product.toObject(),
+            mainImage: product.mainImage.secure_url,
+            subImages: product.subImages.map(img => img.secure_url,
+            ),
+
+        }
+    })
+    return next(new AppSuccess("success", 200, { count, products }));
 }
 
 export const getProductById = async (req, res, next) => {
@@ -89,6 +122,13 @@ export const getProductById = async (req, res, next) => {
         {
             path: 'subCategoryId',
             select: 'name'
+        },
+        {
+            path: 'reviews',
+            populate: {
+                path: 'userId',
+                select: 'username -_id',
+            }
         }
     ]);
     if (!product) {

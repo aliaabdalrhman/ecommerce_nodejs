@@ -12,5 +12,4 @@ router.put('/sendCode', asyncHandler(validation(sendCodeSchema)), asyncHandler(a
 router.put('/forgotPassword', asyncHandler(validation(forgotPasswordSchema)), asyncHandler(authController.forgotPassword));
 router.get('/confirmEmail/:token', asyncHandler(authController.confirmEmail));
 
-
 export default router;

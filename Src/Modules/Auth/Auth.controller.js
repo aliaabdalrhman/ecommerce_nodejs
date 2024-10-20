@@ -12,7 +12,6 @@ export const register = async (req, res, next) => {
     if (user) {
         return next(new AppError("Email already exists", 409));
     }
-
     const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUND));
     await userModel.create({ username, email, password: hashedPassword });
     const token = jwt.sign({ email }, process.env.LOGINSIGNATURE, { expiresIn: '24h' });
@@ -81,7 +80,7 @@ export const register = async (req, res, next) => {
                     <p>Dear ${username},</p>
                     <p>Thank you for joining <strong>Alia'a Store</strong>! We’re thrilled to have you as part of our growing community. Now that you're a member, we hope you enjoy discovering our products and benefiting from exclusive offers just for you.</p>
                     <p>If you ever need assistance or have any questions, feel free to reach out to our support team. We're always here to help!</p>
-                     <p><a href='http://localhost:3000/auth/confirmEmail/${token}'>Please confirm your email</a></p>
+                     <p><a href='${process.env.URL}/auth/confirmEmail/${token}'>Please confirm your email</a></p>
                     <p>Warm regards,<br><strong>The Alia'a Store Support Team</strong></p>
                 </div>
                 <div class="email-footer">
@@ -121,7 +120,7 @@ export const login = async (req, res, next) => {
             return next(new AppError("Invalid password", 401));
         }
         if (!user.confirmEmail) {
-            return next(new AppError("Email is not confirmed", 401));
+            return next(new AppError("Email is not confirmed, please confirm your email", 401));
         }
         const token = jwt.sign({ id: user._id }, process.env.LOGINSIGNATURE, { expiresIn: "24h" });
         return next(new AppSuccess("success", 200, { token }));
@@ -229,4 +228,5 @@ export const forgotPassword = async (req, res, next) => {
     user.save();
     return next(new AppSuccess("success", 200));
 }
+
 

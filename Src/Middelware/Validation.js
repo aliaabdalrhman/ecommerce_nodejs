@@ -22,7 +22,18 @@ export const generalFields = {
     status: joi.string().valid('Active', 'InActive').messages({
         'any.only': 'status must be either Active or InActive ',
         'string.empty': 'status is required'
-    })
+    }),
+    // file: joi.object({
+    //     size: joi.number().positive().required(),
+    //     path: joi.string().required(),
+    //     filename: joi.string().required(),
+    //     destination: joi.string().required(),
+    //     mimetype: joi.string().required(),
+    //     encoding: joi.string().required(),
+    //     originalname: joi.string().required(),
+    //     fieldname: joi.string().required(),
+    //     dest: joi.string(),
+    // })
 }
 
 const validation = (schema) => {

@@ -4,6 +4,7 @@ import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
 import { AppSuccess } from "../../../GlobalSuccess.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
+import slugify from "slugify";
 
 export const createSubCategory = async (req, res, next) => {
     req.body.name = req.body.name.toLowerCase();
@@ -20,7 +21,8 @@ export const createSubCategory = async (req, res, next) => {
         }
         else {
             const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `${process.env.APPNAME}/subCategory` });
-            await subCategoryModel.create({ name: req.body.name, image: { secure_url, public_id }, createdBy: req.id, updatedBy: req.id, categoryId });
+            req.body.slug = slugify(req.body.name);
+            await subCategoryModel.create({ name: req.body.name, slug: req.body.slug, image: { secure_url, public_id }, createdBy: req.id, updatedBy: req.id, categoryId });
             return next(new AppSuccess("success", 201));
         }
     }
@@ -35,6 +37,22 @@ export const getAllSubCategoryByCategoryId = async (req, res, next) => {
 
     }
     const subCategory = await subCategoryModel.find({ categoryId }).select('name');
+    if (!subCategory) {
+        return next(new AppError("Invalid SubCategory", 404));
+    }
+    else {
+        return next(new AppSuccess("success", 200, { subCategory }));
+    }
+}
+
+export const getActiveSubCategory = async (req, res, next) => {
+    const { categoryId } = req.params;
+    const category = await categoryModel.findById({ _id: categoryId });
+    if (!category) {
+        return next(new AppError("Invalid Category", 404));
+
+    }
+    const subCategory = await subCategoryModel.find({ categoryId, status: "Active" });
     if (!subCategory) {
         return next(new AppError("Invalid SubCategory", 404));
     }

@@ -12,6 +12,10 @@ const categorySchema = new Schema({
         type: Object,
         required: true,
     },
+    slug: {
+        type: String,
+        required: true,
+    },
     status: {
         type: String,
         enum: ['Active', 'InActive'],
@@ -21,7 +25,6 @@ const categorySchema = new Schema({
         type: Types.ObjectId,
         ref: 'User',
         required: true,
-
     },
     updatedBy: {
         type: Types.ObjectId,

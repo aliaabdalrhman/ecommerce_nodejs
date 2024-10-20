@@ -15,7 +15,9 @@ const router = Router(); // Initialize a new router instance
 
 router.use('/:categoryId/subcategory', subCategoryRouter);
 // Route to get all categories
-router.get('/', asyncHandler(categoryController.getAllCategories));
+router.get('/', asyncHandler(auth(endPoints.getAll)), asyncHandler(categoryController.getAllCategories));
+
+router.get('/active', asyncHandler(categoryController.getActiveCategories));
 
 // Route to create a new category
 router.post('/createCategory', fileUpload().single('image'), asyncHandler(auth(endPoints.create)), validation(createCategorySchema), asyncHandler(categoryController.createCategory));
@@ -28,5 +30,6 @@ router.put('/updateCategory/:id', asyncHandler(auth(endPoints.update)), validati
 
 // Route to delete a category by ID
 router.delete('/deletCategory/:id', asyncHandler(auth(endPoints.delete)), validation(deleteCategorySchema), asyncHandler(categoryController.deletCategory));
+
 
 export default router; // Export the configured router for use in the main application

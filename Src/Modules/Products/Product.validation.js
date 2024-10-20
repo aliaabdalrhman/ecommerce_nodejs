@@ -12,12 +12,15 @@ export const createProductSchema = {
         }),
         categoryId: generalFields.id,
         subCategoryId: generalFields.id,
-        price: joi.number().required(),
-        stock: joi.number().required(),
+        price: joi.number().min(1).required(),
+        stock: joi.number().min(0).default(1).required(),
         colors: joi.string().optional(),
         sizes: joi.string().optional(),
-        discount:joi.number().integer().positive().optional(),
-        
+        discount:joi.number().integer().min(0).default(0).positive().optional(),
+        // file: joi.object({
+        //     mainImage: joi.array().items(generalFields.file.required()).length(1),
+        //     subImages: joi.array().items(generalFields.file.required()).min(2).max(5)
+        // }),
     }),
 }
 

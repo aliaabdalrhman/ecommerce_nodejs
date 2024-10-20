@@ -6,7 +6,7 @@ export const createCouponSchema = {
     body: joi.object({
         name: generalFields.name,
         amount: joi.number().positive().required(),
-        expireDate: joi.required()
+        expireDate: joi.date().greater('now').required()
     }),
 }
 

@@ -14,8 +14,8 @@ router.use('/:productId/review', reviewRouter);
 
 router.post('/',
     fileUpload().fields([{ name: 'mainImage', maxCount: 1 }, { name: 'subImages', maxCount: 5 }]),
-    asyncHandler(auth(endPoints.create)),
     validation(createProductSchema),
+    asyncHandler(auth(endPoints.create)),
     asyncHandler(productController.createProduct));
 
 router.get('/',

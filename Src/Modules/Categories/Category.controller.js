@@ -4,12 +4,19 @@ import subCategoryModel from "../../../DB/Models/SubCategory.model.js";
 import { AppError } from "../../../GlobalError.js";
 import { AppSuccess } from "../../../GlobalSuccess.js";
 import cloudinary from "../../Utilities/Cloudinary.js";
+import slugify from "slugify";
 
 // get all category
 export const getAllCategories = async (rea, res, next) => {
     // Retrieve all categories from the database, selecting only the 'name' field
     const categories = await categoryModel.find({}).select('name');
     // Return the list of categories in the response with a success message
+    return next(new AppSuccess("success", 200, { categories }));
+}
+
+// get active categories 
+export const getActiveCategories = async (req, res, next) => {
+    const categories = await categoryModel.find({ status: 'Active' });
     return next(new AppSuccess("success", 200, { categories }));
 }
 
@@ -28,6 +35,7 @@ export const createCategory = async (req, res, next) => {
         req.body.image = { secure_url, public_id };
         req.body.createdBy = req.id;
         req.body.updatedBy = req.id;
+        req.body.slug = slugify(req.body.name);
         // If the category doesn't exist, create a new one
         await categoryModel.create(req.body);
         return next(new AppSuccess("success", 201));

@@ -10,7 +10,8 @@ import { createSubCategorySchema, deleteSubCategorySchema, getAllSubCategoryByCa
 
 const router = Router({ mergeParams: true });
 router.post('/', fileUpload().single('image'), asyncHandler(auth(endPoints.create)), validation(createSubCategorySchema), asyncHandler(subCategoryController.createSubCategory));
-router.get('/', validation(getAllSubCategoryByCategoryIdSchema), asyncHandler(subCategoryController.getAllSubCategoryByCategoryId));
+router.get('/', asyncHandler(auth(endPoints.getAll)),validation(getAllSubCategoryByCategoryIdSchema), asyncHandler(subCategoryController.getAllSubCategoryByCategoryId));
+router.get('/active', asyncHandler(subCategoryController.getActiveSubCategory));
 router.get('/:id', validation(getSubCategoryDetailsSchema), asyncHandler(subCategoryController.getSubCategoryDetails));
 router.put('/:id', asyncHandler(auth(endPoints.update)), validation(updateSubCategorySchema), asyncHandler(subCategoryController.updateSubCategory));
 router.delete('/:id', asyncHandler(auth(endPoints.delete)), validation(deleteSubCategorySchema), asyncHandler(subCategoryController.deleteSubCategory));

@@ -5,6 +5,8 @@ import productModel from "../../../DB/Models/Product.model.js";
 import userModel from "../../../DB/Models/User.model.js";
 import { AppError } from "../../../GlobalError.js";
 import { AppSuccess } from "../../../GlobalSuccess.js";
+import createInvoice from "../../Utilities/Pdf.js";
+
 
 export const createOrder = async (req, res, next) => {
     const userId = req.id;
@@ -64,6 +66,19 @@ export const createOrder = async (req, res, next) => {
         updatedBy: userId
     });
     if (order) {
+
+        const invoice = {
+            shipping: {
+                name: user.username,
+                address: order.address,
+                phoneNumber: order.phone
+            },
+            items: order.products,
+            subtotal: order.finalPrice,
+            invoice_nr: order._id
+        };
+
+        createInvoice(invoice, "invoice.pdf");
         for (const product of finalProductList) {
             await productModel.findOneAndUpdate({ _id: product.productId },
                 {

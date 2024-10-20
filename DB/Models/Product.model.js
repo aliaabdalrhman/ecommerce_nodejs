@@ -22,7 +22,6 @@ const productSchema = new Schema({
     subImages: {
         type: [Object],
         required: true
-
     },
     price: {
         type: Number,
@@ -49,6 +48,10 @@ const productSchema = new Schema({
         ref: 'SubCategory',
         required: true
     },
+    slug: {
+        type: String,
+        required: true,
+    },
     colors: {
         type: [String],
         required: true
@@ -71,7 +74,9 @@ const productSchema = new Schema({
     }
 
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
 productSchema.virtual('reviews', {
