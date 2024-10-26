@@ -1,7 +1,7 @@
 import { Router } from "express";
 import * as productController from './Product.controller.js'
 import { asyncHandler } from "../../Utilities/CatchError.js";
-import fileUpload from "../../Utilities/Multur.js";
+import fileUpload, { fileType } from "../../Utilities/Multur.js";
 import { auth } from "../../Middelware/Auth.js";
 import { endPoints } from "./Product.role.js";
 import validation from "../../Middelware/Validation.js";
@@ -13,7 +13,7 @@ const router = Router();
 router.use('/:productId/review', reviewRouter);
 
 router.post('/',
-    fileUpload().fields([{ name: 'mainImage', maxCount: 1 }, { name: 'subImages', maxCount: 5 }]),
+    fileUpload(fileType.image).fields([{ name: 'mainImage', maxCount: 1 }, { name: 'subImages', maxCount: 5 }]),
     validation(createProductSchema),
     asyncHandler(auth(endPoints.create)),
     asyncHandler(productController.createProduct));

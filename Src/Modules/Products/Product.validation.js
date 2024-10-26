@@ -17,10 +17,6 @@ export const createProductSchema = {
         colors: joi.string().optional(),
         sizes: joi.string().optional(),
         discount:joi.number().integer().min(0).default(0).positive().optional(),
-        // file: joi.object({
-        //     mainImage: joi.array().items(generalFields.file.required()).length(1),
-        //     subImages: joi.array().items(generalFields.file.required()).min(2).max(5)
-        // }),
     }),
 }
 

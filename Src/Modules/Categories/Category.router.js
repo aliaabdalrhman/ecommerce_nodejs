@@ -3,7 +3,7 @@
 import { Router } from "express";
 import * as categoryController from './Category.controller.js';
 import { asyncHandler } from "../../Utilities/CatchError.js";
-import fileUpload from "../../Utilities/Multur.js";
+import fileUpload, { fileType } from "../../Utilities/Multur.js";
 import validation from "../../Middelware/Validation.js";
 import { createCategorySchema, deleteCategorySchema, getCategorySchema, updateCategorySchema } from "./Category.validation.js";
 import { auth } from "../../Middelware/Auth.js";
@@ -20,7 +20,10 @@ router.get('/', asyncHandler(auth(endPoints.getAll)), asyncHandler(categoryContr
 router.get('/active', asyncHandler(categoryController.getActiveCategories));
 
 // Route to create a new category
-router.post('/createCategory', fileUpload().single('image'), asyncHandler(auth(endPoints.create)), validation(createCategorySchema), asyncHandler(categoryController.createCategory));
+router.post('/createCategory',
+    fileUpload(fileType.image).single('image'),
+    asyncHandler(auth(endPoints.create)),
+    validation(createCategorySchema), asyncHandler(categoryController.createCategory));
 
 // Route to get details of a specific category by ID
 router.get('/CategoryDetails/:id', validation(getCategorySchema), asyncHandler(categoryController.getCategoryDetails));

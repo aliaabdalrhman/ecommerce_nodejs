@@ -1,7 +1,7 @@
 import multur from 'multer'
 
 export const fileType = {
-    image: ['image/png', 'image/jpeg', 'image/jpj', 'image/gif', 'image/webp'],
+    image: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'],
     pdf: ['application/pdf'],
     excel: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 }
