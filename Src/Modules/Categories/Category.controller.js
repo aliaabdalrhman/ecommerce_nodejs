@@ -99,7 +99,7 @@ export const updateCategory = async (req, res, next) => {
 }
 
 //  delete a category by its ID
-export const deletCategory = async (req, res, next) => {
+export const deleteCategory = async (req, res, next) => {
     // Extract the category ID from the request parameters
     const { id } = req.params;
     // Find the category by its ID and delete it from the database
